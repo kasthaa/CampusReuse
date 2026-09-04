@@ -65,7 +65,7 @@ function App() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/resources"
+        "https://campusreuse.onrender.com//api/resources"
       );
 
       if (!response.ok) {
@@ -372,7 +372,7 @@ function App() {
           // -----------------------------------------------
 
           const response = await fetch(
-            "http://localhost:5000/api/resources",
+            " https://campusreuse.onrender.com/api/resources",
             {
               method: "POST",
 
