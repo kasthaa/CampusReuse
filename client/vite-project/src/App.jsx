@@ -29,7 +29,8 @@ function App() {
   // =====================================================
 
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] =
+    useState("All");
 
   const categories = [
     "All",
@@ -53,6 +54,7 @@ function App() {
     description: "",
     category: "Books",
     price: "",
+    email: "",
   });
 
   // =====================================================
@@ -65,7 +67,7 @@ function App() {
       setError("");
 
       const response = await fetch(
-        "https://campusreuse.onrender.com//api/resources"
+        "https://campusreuse.onrender.com/api/resources"
       );
 
       if (!response.ok) {
@@ -246,6 +248,77 @@ function App() {
   };
 
   // =====================================================
+  // GET LOGGED-IN USER EMAIL
+  // =====================================================
+
+  const getSellerEmail = () => {
+    // ---------------------------------------------------
+    // 1. CHECK SAVED USER OBJECT
+    // ---------------------------------------------------
+
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+
+        const email =
+          user?.email ||
+          user?.user?.email;
+
+        if (email) {
+          return email.trim();
+        }
+      } catch (err) {
+        console.error(
+          "Could not parse saved user:",
+          err
+        );
+      }
+    }
+
+    // ---------------------------------------------------
+    // 2. CHECK LOCAL STORAGE EMAIL
+    // ---------------------------------------------------
+
+    const possibleEmailKeys = [
+      "email",
+      "userEmail",
+      "user_email",
+    ];
+
+    for (const key of possibleEmailKeys) {
+      const value = localStorage.getItem(key);
+
+      if (
+        value &&
+        value !== "null" &&
+        value !== "undefined"
+      ) {
+        return value.trim();
+      }
+    }
+
+    // ---------------------------------------------------
+    // 3. CHECK SESSION STORAGE
+    // ---------------------------------------------------
+
+    for (const key of possibleEmailKeys) {
+      const value = sessionStorage.getItem(key);
+
+      if (
+        value &&
+        value !== "null" &&
+        value !== "undefined"
+      ) {
+        return value.trim();
+      }
+    }
+
+    return null;
+  };
+
+  // =====================================================
   // SUBMIT RESOURCE
   // =====================================================
 
@@ -305,6 +378,24 @@ function App() {
     }
 
     // ---------------------------------------------------
+    // GET SELLER EMAIL
+    // ---------------------------------------------------
+
+    const sellerEmail = getSellerEmail();
+
+    if (!sellerEmail) {
+      setError(
+        "Your email could not be found. Please login again."
+      );
+
+      setFormLoading(false);
+      return;
+    }
+
+    console.log("Seller ID:", sellerId);
+    console.log("Seller Email:", sellerEmail);
+
+    // ---------------------------------------------------
     // CHECK GEOLOCATION
     // ---------------------------------------------------
 
@@ -351,6 +442,10 @@ function App() {
 
           seller: sellerId,
 
+          // IMPORTANT:
+          // Send logged-in user's email to backend
+          email: sellerEmail,
+
           location: {
             type: "Point",
 
@@ -372,7 +467,7 @@ function App() {
           // -----------------------------------------------
 
           const response = await fetch(
-            " https://campusreuse.onrender.com/api/resources",
+            "https://campusreuse.onrender.com/api/resources",
             {
               method: "POST",
 
@@ -424,6 +519,7 @@ function App() {
             description: "",
             category: "Books",
             price: "",
+            email: "",
           });
 
           // -----------------------------------------------
@@ -882,25 +978,28 @@ function App() {
                 💰 ₹{selectedResource.price}
               </span>
 
-               <div>
-  <div>
-    👤{" "}
-    {selectedResource.seller?.name ||
-      "Unknown seller"}
-  </div>
+              <div>
 
-  <div>
-    📧{" "}
-    {selectedResource.seller?.email ||
-      "Email not available"}
-  </div>
+                <div>
+                  👤{" "}
+                  {selectedResource.seller?.name ||
+                    "Unknown seller"}
+                </div>
 
-  <div>
-    📱{" "}
-    {selectedResource.seller?.phone ||
-      "Phone not available"}
-  </div>
-</div>
+                <div>
+                  📧{" "}
+                  {selectedResource.seller?.email ||
+                    selectedResource.email ||
+                    "Email not available"}
+                </div>
+
+                <div>
+                  📱{" "}
+                  {selectedResource.seller?.phone ||
+                    "Phone not available"}
+                </div>
+
+              </div>
 
             </div>
 
@@ -908,20 +1007,24 @@ function App() {
 
               <button
                 className="submit-resource"
-                 onClick={() => {
-  const email = selectedResource.seller?.email;
+                onClick={() => {
+                  const email =
+                    selectedResource.seller?.email ||
+                    selectedResource.email;
 
-  if (email) {
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`,
-      "_blank"
-    );
-  } else {
-    alert(
-      "Seller contact information is not available for this resource."
-    );
-  }
-}}
+                  if (email) {
+                    window.open(
+                      `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+                        email
+                      )}`,
+                      "_blank"
+                    );
+                  } else {
+                    alert(
+                      "Seller contact information is not available for this resource."
+                    );
+                  }
+                }}
               >
                 📩 Contact Seller
               </button>
