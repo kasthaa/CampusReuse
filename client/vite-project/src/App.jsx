@@ -67,7 +67,7 @@ function App() {
       setError("");
 
       const response = await fetch(
-        "https://campusreuse.onrender.com/api/resources"
+        "https://campusreuse-backend.onrender.com/api/resources"
       );
 
       if (!response.ok) {
@@ -466,8 +466,8 @@ function App() {
           // POST RESOURCE
           // -----------------------------------------------
 
-          const response = await fetch(
-            "https://campusreuse.onrender.com/api/resources",
+          const resomponse = await fetch(
+            " https://campusreuse-backend.onrender.com/api/resources",
             {
               method: "POST",
 

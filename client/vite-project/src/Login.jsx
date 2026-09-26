@@ -31,7 +31,7 @@ function Login({ onLogin }) {
 
     try {
       const response = await fetch(
-        " https://campusreuse.onrender.com/api/auth/login",
+        "https://campusreuse-backend.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
@@ -109,7 +109,7 @@ function Login({ onLogin }) {
 
     try {
       const response = await fetch(
-        " https://campusreuse.onrender.com/api/auth/register",
+        "https://campusreuse-backend.onrender.com/api/auth/register",
         {
           method: "POST",
           headers: {
